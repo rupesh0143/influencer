@@ -14,7 +14,7 @@ const Profile = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        console.log('Fetching profile for ID:', id); // Debug log
+        // console.log('Fetching profile for ID:', id); // Debug log
         const response = await fetch(`http://localhost:8000/profile/${id}`, {
           method: 'GET',
           headers: {
@@ -27,7 +27,7 @@ const Profile = () => {
         }
 
         const data = await response.json();
-        console.log('Fetched data:', data); // Debug log
+        // console.log('Fetched data:', data); // Debug log
 
         if (data.success) {
           setUser(data.data); // Assuming data.data is the user object

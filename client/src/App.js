@@ -6,17 +6,16 @@ import './App.css';
 import Auth from './Pages/auth/Auth';
 import Home from './Pages/home/Home';
 import Profile from './Pages/profile/Profile';
-import Services from './Pages/services/Services';
+// import Services from './Pages/services/Services';
 import Header from './Components/Header';
+import ForgetPassword from './Pages/forgetpassword';
 
 function App() {
   const user = useSelector((state) => state.authReducer.authData);
   const location = useLocation(); // Get the current route
 
-  // Hide header for /login and /signup
-  const showHeader = !['/login', '/signup'].includes(location.pathname);
+  const showHeader = !['/login', '/signup','/forgetpassword'].includes(location.pathname);
 
-  // Example: Show a toast when user logs in (based on Redux state change)
   useEffect(() => {
     if (user && location.pathname === '/home') {
       toast.success('Welcome back!', {
@@ -42,10 +41,11 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/home" element={<Home />} />
-        <Route path="/login" element={user ? <Navigate to="../home" /> : <Auth />} />
-        <Route path="/signup" element={user ? <Navigate to="../home" /> : <Auth />} />
+        <Route path="/login" element={user ? <Navigate to="/home" /> : <Auth />} />
+        <Route path="/signup" element={user ? <Navigate to="/home" /> : <Auth />} />
+        <Route path="/forgetpassword" element={user ? <Navigate to="/home" /> : <ForgetPassword/>} />
         <Route path="/profile/:id" element={<Profile />} />
-        <Route path="/services" element={<Services />} />
+        {/* <Route path="/services" element={<Services />} /> */}
       </Routes>
     </div>
   );

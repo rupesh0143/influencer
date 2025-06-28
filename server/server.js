@@ -431,6 +431,129 @@ app.post('/checkUser', async (req, res) => {
   }
 });
 
+// Endpoint to initiate forgot password
+app.post('/forgetpassword', async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    // Validate input
+    if (!email) {
+      return res.status(400).json({ success: false, error: 'Email is required' });
+    }
+
+    // Connect to SQL Server
+    let pool = await sql.connect(dbConfig);
+
+    // Execute stored procedure
+    let result = await pool.request()
+      .input('Email', sql.VarChar(255), email)
+      .execute('USP_INS_ForgotPassword');
+
+    if (result.returnValue === 0) {
+      res.status(200).json({
+        success: true,
+        message: 'Password reset request initiated. Check your email for OTP.'
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        error: 'Email not found'
+      });
+    }
+  } catch (error) {
+    console.error('Forgot Password error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  } finally {
+    sql.close();
+  }
+});
+
+// Endpoint to validate OTP
+app.post('/otpvalidation', async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+
+    // Validate input
+    if (!email || !otp) {
+      return res.status(400).json({ success: false, error: 'Email and OTP are required' });
+    }
+
+    // Connect to SQL Server
+    let pool = await sql.connect(dbConfig);
+
+    // Execute stored procedure
+    let result = await pool.request()
+      .input('Email', sql.VarChar(255), email)
+      .input('OTP', sql.VarChar(50), otp)
+      .execute('USP_SEL_ValidateOtp');
+
+    if (result.recordset.length > 0) {
+      res.status(200).json({
+        success: true,
+        message: 'OTP validated successfully'
+      });
+    } else {
+      res.status(400).json({
+        success: false,
+        error: 'Invalid OTP'
+      });
+    }
+  } catch (error) {
+    console.error('OTP Validation error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  } finally {
+    sql.close();
+  }
+});
+
+// Endpoint to change password
+app.post('/changepassword', async (req, res) => {
+  try {
+    const { email, newPassword } = req.body;
+
+    // Validate input
+    if (!email || !newPassword) {
+      return res.status(400).json({ success: false, error: 'Email and new password are required' });
+    }
+
+    // Connect to SQL Server
+    let pool = await sql.connect(dbConfig);
+
+    // Execute stored procedure
+    let result = await pool.request()
+      .input('email', sql.VarChar(255), email)
+      .input('password', sql.VarChar(255), newPassword) // Store password as plain text
+      .execute('USP_UPD_ForgotPassword');
+
+    if (result.returnValue === 0) {
+      res.status(200).json({
+        success: true,
+        message: 'Password changed successfully'
+      });
+    } else {
+      res.status(400).json({
+        success: false,
+        error: 'Failed to change password'
+      });
+    }
+  } catch (error) {
+    console.error('Change Password error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  } finally {
+    sql.close();
+  }
+});
+
+
 // Start server
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);

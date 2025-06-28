@@ -26,7 +26,7 @@ const Home = () => {
         }
 
         const result = await response.json();
-        console.log('Fetched profiles:', result);
+        // console.log('Fetched profiles:', result);
 
         if (result.success) {
           setData(result.data);
